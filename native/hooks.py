@@ -252,3 +252,13 @@ app_license = "mit"
       #  ]
  #   }
 #]
+# Scheduled Tasks
+# ---------------
+
+scheduler_events = {
+    "cron": {
+        "0 2 * * *": [  # 2:00 PM daily (14:00 in 24-hour format)
+            "native.native.doctype.renewal_tracking.renewal_tracking.update_all_renewal_stages_heavy"
+        ]
+    }
+}
