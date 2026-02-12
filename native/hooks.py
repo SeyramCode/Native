@@ -242,3 +242,13 @@ app_license = "mit"
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+# Document Events
+# ---------------
+#fixtures = [
+    #{
+       # "dt": "DocType",
+       # "filters": [
+       #     ["name", "in", ["Renewal Tracking", "Renewal Tracking Item"]]
+      #  ]
+ #   }
+#]
