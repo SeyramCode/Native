@@ -257,7 +257,7 @@ app_license = "mit"
 
 scheduler_events = {
     "cron": {
-        "0 2 * * *": [  # 2:00 PM daily (14:00 in 24-hour format)
+        "0 14 * * *": [  # Keep it as a list
             "native.native.doctype.renewal_tracking.renewal_tracking.update_all_renewal_stages_heavy"
         ]
     }
