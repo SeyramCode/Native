@@ -230,7 +230,7 @@ def get_items_from_sales_order(sales_order):
             'description': item.description,
             'brand': item.brand,
             'item_group': item.item_group,
-            'uom': item.oum,
+            'oum': item.uom,
             'qty': item.qty,
             'rate': item.rate,
         }
