@@ -10,6 +10,7 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_tufy",
+  "naming_series",
   "renewal_title",
   "customer",
   "customer_name",
@@ -38,16 +39,13 @@
   "net_total_base",
   "column_break_dtjr",
   "net_total",
-  "naming_series",
   "contacts_tab",
   "custom_contact",
   "column_break_dayn",
-  "ref_tab",
-  "reference",
+  "section_break_mbyr",
   "reference_doctype",
-  "column_break_bgjd",
+  "column_break_qyiy",
   "refererence_name",
-  "column_break_reqz",
   "connections_tab"
  ],
  "fields": [
@@ -65,7 +63,8 @@
    "fieldname": "customer",
    "fieldtype": "Link",
    "label": "Customer",
-   "options": "Customer"
+   "options": "Customer",
+   "reqd": 1
   },
   {
    "fetch_from": "customer.customer_name",
@@ -163,6 +162,7 @@
    "search_index": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "days_remaining",
    "fieldtype": "Int",
    "in_list_view": 1,
@@ -222,7 +222,7 @@
   {
    "default": "currency",
    "fieldname": "net_total",
-   "fieldtype": "Data",
+   "fieldtype": "Currency",
    "label": "Net Total",
    "read_only": 1
   },
@@ -231,6 +231,9 @@
    "fieldname": "naming_series",
    "fieldtype": "Select",
    "hidden": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
    "label": "Series",
    "options": "REN-ORD-.YYYY.-",
    "read_only": 1,
@@ -264,21 +267,11 @@
   },
   {
    "allow_on_submit": 1,
-   "fieldname": "reference",
-   "fieldtype": "Section Break",
-   "label": "References"
-  },
-  {
-   "allow_on_submit": 1,
    "fieldname": "reference_doctype",
    "fieldtype": "Link",
    "label": "Reference Doctype",
    "options": "DocType",
    "read_only": 1
-  },
-  {
-   "fieldname": "column_break_bgjd",
-   "fieldtype": "Column Break"
   },
   {
    "allow_on_submit": 1,
@@ -290,15 +283,12 @@
    "read_only": 1
   },
   {
-   "fieldname": "column_break_reqz",
-   "fieldtype": "Column Break",
-   "hidden": 1
+   "fieldname": "section_break_mbyr",
+   "fieldtype": "Section Break"
   },
   {
-   "allow_on_submit": 1,
-   "fieldname": "ref_tab",
-   "fieldtype": "Tab Break",
-   "label": "Reference"
+   "fieldname": "column_break_qyiy",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
@@ -306,7 +296,7 @@
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2026-02-12 12:05:57.034959",
+ "modified": "2026-02-23 17:16:20.381341",
  "modified_by": "Administrator",
  "module": "Native",
  "name": "Renewal Tracking",

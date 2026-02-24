@@ -497,7 +497,7 @@ function validate_and_calculate(frm) {
     // Calculate days remaining
     let today = frappe.datetime.get_today();
     let days_remaining = frappe.datetime.get_day_diff(frm.doc.license_end, today);
-    frm.set_value('days_remaining', days_remaining);
+    frm.set_value('days_remaining', Math.max(0,days_remaining)); //clamp to 0 to avoid negative values
 }
 
 function fetch_items_from_sales_order(frm) {

@@ -165,7 +165,7 @@ class RenewalTracking(Document):
             
             # Calculate days remaining until license end
             days_to_end = date_diff(license_end, now_date)
-            self.days_remaining = days_to_end
+            self.days_remaining = max(0,int(days_to_end))  # Ensure non-negative
             
             # Calculate milestone dates
             date_90_days_before = add_days(license_end, -90)
