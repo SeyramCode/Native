@@ -220,10 +220,10 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "currency",
    "fieldname": "net_total",
    "fieldtype": "Currency",
    "label": "Net Total",
+   "options": "currency",
    "read_only": 1
   },
   {

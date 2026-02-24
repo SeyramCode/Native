@@ -19,32 +19,36 @@ class RenewalTracking(Document):
         self.calculate_item_values()
         # Calculate totals
         self.calculate_totals()
-    
-    def before_save(self):
-        """Calculate renewal stage and other values before saving"""
-        self.calculate_item_values()
-        self.calculate_totals()
-        # Calculate renewal stage for draft and submitted documents
         if self.license_start and self.license_end:
             self.calculate_renewal_stage()
     
+    def before_save(self):
+        """Calculate renewal stage and other values before saving"""
+        #self.calculate_item_values()
+        #self.calculate_totals()
+        # Calculate renewal stage for draft and submitted documents
+        #if self.license_start and self.license_end:
+            #self.calculate_renewal_stage()
+        pass
+    
     def set_exchange_rate(self):
-        """Set exchange rate from Currency Exchange doctype"""
         if not self.currency or not self.company:
             return
         
         company_currency = frappe.db.get_value('Company', self.company, 'default_currency')
         
-        # For Ostec Ltd (GHS) or Ostec SA (CFA) - if base currency selected, exchange rate = 1
         if self.currency == company_currency:
             self.exchange_rate = 1.0
             return
         
-        # If exchange rate already manually entered, keep it
-        if self.exchange_rate and self.exchange_rate > 0:
+        # Check if currency has changed from what's saved in DB
+        saved_currency = frappe.db.get_value('Renewal Tracking', self.name, 'currency') if self.name else None
+        currency_changed = saved_currency != self.currency
+        
+        # Only skip lookup if rate already set AND currency hasn't changed
+        if self.exchange_rate and self.exchange_rate > 0 and not currency_changed:
             return
         
-       # Try to find LATEST exchange rate from Currency Exchange doctype
         exchange_rates = frappe.get_list('Currency Exchange',
             filters={
                 'from_currency': self.currency,
@@ -55,88 +59,66 @@ class RenewalTracking(Document):
             limit=1
         )
         
-        if exchange_rates and len(exchange_rates) > 0:
-            # Found in system, use the latest exchange rate
+        if exchange_rates:
             self.exchange_rate = flt(exchange_rates[0].exchange_rate)
         else:
-            # Currency pair not available - set to 0 to trigger manual entry
             self.exchange_rate = 0.0
-    
-    def calculate_item_values(self):
+        
+        def calculate_totals(self):
+            """Calculate net_total and net_total_base from all item lines"""
+            if not self.items:
+                self.net_total = 0.0
+                self.net_total_base = 0.0
+                return
+            
+            # Sum all amounts
+            self.net_total = sum(flt(item.amount, 2) for item in self.items)
+            
+            # Sum all base amounts
+            self.net_total_base = sum(flt(item.base_amount, 2) for item in self.items)
+        
+        def get_company_currency(self):
+            """Get company's default currency"""
+            if self.company:
+                return frappe.db.get_value('Company', self.company, 'default_currency')
+            return None
+        
+        def on_submit(self):
+            """Calculate and update renewal stage on submission"""
+            try:
+                self.calculate_renewal_stage()
+                frappe.db.set_value(
+                    'Renewal Tracking',
+                    self.name,
+                    {
+                        'renewal_stage': self.renewal_stage,
+                        'days_remaining': self.days_remaining
+                    },
+                    update_modified=False
+                )
+                frappe.db.commit()
                 
-        # Get exchange rate
-        exchange_rate = flt(self.exchange_rate) or 1.0
-        company_currency = self.get_company_currency()
+                frappe.logger().info(
+                    f"Renewal stage set to '{self.renewal_stage}' on submission of {self.name}"
+                )
+            except Exception as e:
+                frappe.log_error(
+                    message=frappe.get_traceback(),
+                    title=f"Error calculating renewal stage on submit - {self.name}"
+                )
         
-        for item in self.items:
-            # Calculate amount = qty * rate
-            item.amount = flt(item.qty, 2) * flt(item.rate, 2)
+        def validate_license_dates(self):
+            """Validate that license dates are logical"""
+            if not self.license_start or not self.license_end:
+                return #frappe.throw("License Start and License End dates are mandatory")
             
-            # Calculate base currency values using exchange rate
-            if self.currency and company_currency and self.currency != company_currency:
-                # Different currencies - apply exchange rate
-                item.base_rate = flt(item.rate, 2) * exchange_rate
-                item.base_amount = flt(item.amount, 2) * exchange_rate
-            else:
-                # Same currency (base currency) - no conversion needed
-                item.base_rate = item.rate
-                item.base_amount = item.amount
-    
-    def calculate_totals(self):
-        """Calculate net_total and net_total_base from all item lines"""
-        if not self.items:
-            self.net_total = 0.0
-            self.net_total_base = 0.0
-            return
-        
-        # Sum all amounts
-        self.net_total = sum(flt(item.amount, 2) for item in self.items)
-        
-        # Sum all base amounts
-        self.net_total_base = sum(flt(item.base_amount, 2) for item in self.items)
-    
-    def get_company_currency(self):
-        """Get company's default currency"""
-        if self.company:
-            return frappe.db.get_value('Company', self.company, 'default_currency')
-        return None
-    
-    def on_submit(self):
-        """Calculate and update renewal stage on submission"""
-        try:
-            self.calculate_renewal_stage()
-            frappe.db.set_value(
-                'Renewal Tracking',
-                self.name,
-                {
-                    'renewal_stage': self.renewal_stage,
-                    'days_remaining': self.days_remaining
-                },
-                update_modified=False
-            )
-            frappe.db.commit()
+            license_start = getdate(self.license_start)
+            license_end = getdate(self.license_end)
             
-            frappe.logger().info(
-                f"Renewal stage set to '{self.renewal_stage}' on submission of {self.name}"
-            )
-        except Exception as e:
-            frappe.log_error(
-                message=frappe.get_traceback(),
-                title=f"Error calculating renewal stage on submit - {self.name}"
-            )
-    
-    def validate_license_dates(self):
-        """Validate that license dates are logical"""
-        if not self.license_start or not self.license_end:
-            frappe.throw("License Start and License End dates are mandatory")
-        
-        license_start = getdate(self.license_start)
-        license_end = getdate(self.license_end)
-        
-        if license_end <= license_start:
-            frappe.throw(
-                f"License End Date ({license_end}) must be after License Start Date ({license_start})"
-            )
+            if license_end <= license_start:
+                frappe.throw(
+                    f"License End Date ({license_end}) must be after License Start Date ({license_start})"
+                )
     
     def calculate_renewal_stage(self):
         """
@@ -248,7 +230,7 @@ def get_items_from_sales_order(sales_order):
             'description': item.description,
             'brand': item.brand,
             'item_group': item.item_group,
-            'uom': item.uom,
+            'uom': item.oum,
             'qty': item.qty,
             'rate': item.rate,
         }
