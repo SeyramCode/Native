@@ -260,5 +260,8 @@ scheduler_events = {
         "0 2 * * *": [  # Keep it as a list
             "native.native.doctype.renewal_tracking.renewal_tracking.update_all_renewal_stages_heavy"
         ]
-    }
+    },
+    "daily": [
+        "native.native.doctype.regulatory_filing_settings.regulatory_filing_settings.run_daily"
+    ]
 }

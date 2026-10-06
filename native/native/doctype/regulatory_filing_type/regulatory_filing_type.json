@@ -1,0 +1,144 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:filing_type_name",
+ "creation": "2026-10-05 11:34:26.000000",
+ "custom": 0,
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "filing_type_name",
+  "company",
+  "column_break_main",
+  "disabled",
+  "description_section",
+  "description",
+  "due_date_rule_section",
+  "frequency",
+  "period_basis",
+  "column_break_rule",
+  "months_after_period_end",
+  "due_on_last_day",
+  "due_day"
+ ],
+ "fields": [
+  {
+   "fieldname": "filing_type_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Filing Type",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "description": "Auto-creation creates this filing for this company.",
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_main",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "Disabled filing types are skipped by auto-creation.",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Disabled"
+  },
+  {
+   "fieldname": "description_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "description": "Used by auto-creation to work out each filing period and its due date.",
+   "fieldname": "due_date_rule_section",
+   "fieldtype": "Section Break",
+   "label": "Due Date Rule"
+  },
+  {
+   "default": "Monthly",
+   "fieldname": "frequency",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Frequency",
+   "options": "Monthly\nQuarterly\nHalf-Yearly\nAnnually",
+   "reqd": 1
+  },
+  {
+   "default": "Calendar Year",
+   "depends_on": "eval:doc.frequency != 'Monthly'",
+   "description": "Fiscal Year aligns periods to each company's ERPNext Fiscal Year.",
+   "fieldname": "period_basis",
+   "fieldtype": "Select",
+   "label": "Period Basis",
+   "options": "Calendar Year\nFiscal Year"
+  },
+  {
+   "fieldname": "column_break_rule",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "description": "How many months after the period ends the filing is due. 0 = due in the period's last month.",
+   "fieldname": "months_after_period_end",
+   "fieldtype": "Int",
+   "label": "Months After Period End",
+   "non_negative": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "due_on_last_day",
+   "fieldtype": "Check",
+   "label": "Due on Last Day of Month"
+  },
+  {
+   "default": "15",
+   "depends_on": "eval:!doc.due_on_last_day",
+   "description": "If the month is shorter, the last day of that month is used.",
+   "fieldname": "due_day",
+   "fieldtype": "Int",
+   "label": "Due Day of Month",
+   "mandatory_depends_on": "eval:!doc.due_on_last_day"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-10-05 12:17:51.000000",
+ "modified_by": "Administrator",
+ "module": "Native",
+ "name": "Regulatory Filing Type",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "filing_type_name",
+ "sort_order": "ASC",
+ "states": [],
+ "title_field": "filing_type_name"
+}

@@ -1,0 +1,82 @@
+{
+ "actions": [],
+ "creation": "2026-10-05 10:12:41.000000",
+ "custom": 0,
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "auto_creation_section",
+  "auto_create",
+  "days_before_due",
+  "column_break_auto",
+  "generate_from"
+ ],
+ "fields": [
+  {
+   "default": "0",
+   "description": "Master switch. When off, no filings or filing types can be created and auto-creation stops. Existing records stay readable.",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enable Regulatory Filing"
+  },
+  {
+   "depends_on": "enabled",
+   "fieldname": "auto_creation_section",
+   "fieldtype": "Section Break",
+   "label": "Auto-Creation"
+  },
+  {
+   "default": "0",
+   "description": "Runs once a day and creates each filing ahead of its due date, for the company set on its Filing Type.",
+   "fieldname": "auto_create",
+   "fieldtype": "Check",
+   "label": "Enable Auto-Creation"
+  },
+  {
+   "default": "7",
+   "depends_on": "auto_create",
+   "description": "Filings are created this many days before they are due. Missed days (e.g. server downtime) are caught up on the next run.",
+   "fieldname": "days_before_due",
+   "fieldtype": "Int",
+   "label": "Days Before Due Date",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "column_break_auto",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "auto_create",
+   "description": "Earliest due date to create filings for. Anything due before this is assumed to be handled outside the system.",
+   "fieldname": "generate_from",
+   "fieldtype": "Date",
+   "label": "Generate Filings Due From",
+   "mandatory_depends_on": "auto_create"
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-10-05 16:15:27.000000",
+ "modified_by": "Administrator",
+ "module": "Native",
+ "name": "Regulatory Filing Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
