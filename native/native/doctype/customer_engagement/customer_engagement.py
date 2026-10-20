@@ -6,10 +6,6 @@ from frappe.model.document import Document
 
 
 class CustomerEngagement(Document):
-	def validate(self):
-		emails = [row.contact_email for row in self.contacts if row.contact_email]
-		self.engagement_contact = ", ".join(emails)
-
 	def before_insert(self):
 		if not frappe.get_single_value("Customer Engagement Settings", "enabled"):
 			frappe.throw(

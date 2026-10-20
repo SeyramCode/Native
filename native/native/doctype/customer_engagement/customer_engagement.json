@@ -27,8 +27,10 @@
   "details_section",
   "outcome",
   "contacts_tab",
-  "contacts",
-  "engagement_contact",
+  "contact_person",
+  "contact_email",
+  "column_break_contact",
+  "contact_mobile",
   "connections_tab"
  ],
  "fields": [
@@ -161,20 +163,33 @@
   {
    "fieldname": "contacts_tab",
    "fieldtype": "Tab Break",
-   "label": "Contacts"
+   "label": "Contact"
   },
   {
    "depends_on": "eval:doc.customer",
-   "fieldname": "contacts",
-   "fieldtype": "Table",
-   "label": "Contacts",
-   "options": "Customer Engagement Contact"
+   "fieldname": "contact_person",
+   "fieldtype": "Link",
+   "label": "Contact Person",
+   "options": "Contact"
   },
   {
-   "fieldname": "engagement_contact",
-   "fieldtype": "Small Text",
-   "hidden": 1,
-   "label": "Engagement Contact",
+   "fetch_from": "contact_person.email_id",
+   "fieldname": "contact_email",
+   "fieldtype": "Data",
+   "label": "Email",
+   "options": "Email",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_contact",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "contact_person.mobile_no",
+   "fieldname": "contact_mobile",
+   "fieldtype": "Data",
+   "label": "Mobile",
+   "options": "Phone",
    "read_only": 1
   },
   {
@@ -189,7 +204,7 @@
  "indicator_fieldname": "activity_status",
  "is_submittable": 0,
  "links": [],
- "modified": "2026-06-02 00:00:00.000000",
+ "modified": "2026-10-20 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Native",
  "name": "Customer Engagement",

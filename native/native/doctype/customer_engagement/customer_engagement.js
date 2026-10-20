@@ -1,18 +1,8 @@
 // Copyright (c) 2026, Richmond Gedziq and contributors
 // For license information, please see license.txt
 
-function sync_engagement_contact(frm) {
-	const emails = (frm.doc.contacts || [])
-		.map(r => r.contact_email)
-		.filter(Boolean)
-		.join(', ');
-	frm.set_value('engagement_contact', emails);
-}
-
 frappe.ui.form.on('Customer Engagement', {
 	refresh(frm) {
-		sync_engagement_contact(frm);
-
 		frappe.db.get_single_value('Customer Engagement Settings', 'enabled').then(enabled => {
 			if (!enabled) {
 				frm.dashboard.set_headline_alert(
@@ -23,7 +13,7 @@ frappe.ui.form.on('Customer Engagement', {
 			}
 		});
 
-		frm.set_query('contact_person', 'contacts', () => ({
+		frm.set_query('contact_person', () => ({
 			query: 'frappe.contacts.doctype.contact.contact.contact_query',
 			filters: {
 				link_doctype: 'Customer',
@@ -41,15 +31,10 @@ frappe.ui.form.on('Customer Engagement', {
 
 		if (!frm.doc.__islocal) {
 			frm.add_custom_button(__('Email'), () => {
-				const recipients = (frm.doc.contacts || [])
-					.map(r => r.contact_email)
-					.filter(Boolean)
-					.join(', ');
-
 				new frappe.views.CommunicationComposer({
 					doc: frm.doc,
 					frm: frm,
-					recipients: recipients,
+					recipients: frm.doc.contact_email || '',
 					subject: frm.doc.title,
 					attach_document_print: false,
 				});
@@ -74,18 +59,8 @@ frappe.ui.form.on('Customer Engagement', {
 	},
 
 	customer(frm) {
-		frm.set_value('contacts', []);
+		frm.set_value('contact_person', '');
 		frm.set_value('project', '');
 		frm.set_value('issue', '');
-		sync_engagement_contact(frm);
-	}
-});
-
-frappe.ui.form.on('Customer Engagement Contact', {
-	contact_email(frm) {
-		sync_engagement_contact(frm);
-	},
-	contacts_remove(frm) {
-		sync_engagement_contact(frm);
 	}
 });
