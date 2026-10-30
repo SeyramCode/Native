@@ -184,6 +184,7 @@ app_license = "mit"
 # override_doctype_dashboards = {
 # 	"Task": "native.task.get_dashboard_data"
 # }
+override_doctype_dashboards = {"Customer": "native.customer.get_dashboard_data"}
 
 # exempt linked doctypes from being automatically cancelled
 #
