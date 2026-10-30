@@ -30,16 +30,6 @@ frappe.ui.form.on('Customer Engagement', {
 		}));
 
 		if (!frm.doc.__islocal) {
-			frm.add_custom_button(__('Email'), () => {
-				new frappe.views.CommunicationComposer({
-					doc: frm.doc,
-					frm: frm,
-					recipients: frm.doc.contact_email || '',
-					subject: frm.doc.title,
-					attach_document_print: false,
-				});
-			}, __('Create'));
-
 			frm.add_custom_button(__('Issue'), () => {
 				frappe.new_doc('Issue', {
 					subject: frm.doc.title,
