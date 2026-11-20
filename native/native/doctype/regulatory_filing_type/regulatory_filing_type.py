@@ -24,4 +24,3 @@ class RegulatoryFilingType(Document):
 				_("Due Day of Month must be between 1 and 31, or tick Due on Last Day of Month."),
 				title=_("Invalid Due Day"),
 			)
-

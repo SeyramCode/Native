@@ -30,11 +30,15 @@ class RegulatoryFiling(Document):
 
 	def set_title(self):
 		if not self.title:
-			self.title = f"{self.filing_type} - {self.period_label}" if self.period_label else self.filing_type
+			self.title = (
+				f"{self.filing_type} - {self.period_label}" if self.period_label else self.filing_type
+			)
 
 	def set_schedule_key(self):
 		self.schedule_key = (
-			make_schedule_key(self.company, self.filing_type, self.period_start) if self.period_start else None
+			make_schedule_key(self.company, self.filing_type, self.period_start)
+			if self.period_start
+			else None
 		)
 
 	def validate_duplicate(self):
@@ -61,4 +65,6 @@ class RegulatoryFiling(Document):
 
 	def validate_filed_on(self):
 		if self.status == "Filed" and not self.filed_on:
-			frappe.throw(_("Enter the <b>Filed On</b> date when marking a filing as Filed."), title=_("Missing Date"))
+			frappe.throw(
+				_("Enter the <b>Filed On</b> date when marking a filing as Filed."), title=_("Missing Date")
+			)
