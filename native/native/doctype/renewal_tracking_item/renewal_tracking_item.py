@@ -29,22 +29,22 @@ class RenewalTrackingItem(Document):
 		qty: DF.Float
 		rate: DF.Currency
 
-	#if TYPE_CHECKING:
-		#from frappe.types import DF
+	# if TYPE_CHECKING:
+	# from frappe.types import DF
 
-		#base_amount: DF.Currency
-		#brand: DF.Link | None
-		#description: DF.TextEditor | None
-		#item_code: DF.Link | None
-		#item_group: DF.Link | None
-		#item_name: DF.Data | None
-		#parent: DF.Data
-		#parentfield: DF.Data
-		#parenttype: DF.Data
-		#qty: DF.Float
-		#rate: DF.Currency
-		#stock_uom: DF.Link | None
-		#uom: DF.Link | None
+	# base_amount: DF.Currency
+	# brand: DF.Link | None
+	# description: DF.TextEditor | None
+	# item_code: DF.Link | None
+	# item_group: DF.Link | None
+	# item_name: DF.Data | None
+	# parent: DF.Data
+	# parentfield: DF.Data
+	# parenttype: DF.Data
+	# qty: DF.Float
+	# rate: DF.Currency
+	# stock_uom: DF.Link | None
+	# uom: DF.Link | None
 	# end: auto-generated types
 
 	pass
