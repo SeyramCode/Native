@@ -1,7 +1,8 @@
 // Copyright (c) 2026, Richmond Seyram and contributors
 // For license information, please see license.txt
 
-const SETTINGS_MODULE = "native.native.doctype.regulatory_filing_settings.regulatory_filing_settings";
+const SETTINGS_MODULE =
+	"native.native.doctype.regulatory_filing_settings.regulatory_filing_settings";
 
 frappe.ui.form.on("Regulatory Filing Settings", {
 	refresh(frm) {
@@ -20,7 +21,9 @@ frappe.ui.form.on("Regulatory Filing Settings", {
 		frappe.call(`${SETTINGS_MODULE}.get_job_status`).then(({ message: job }) => {
 			if (job && !job.last_execution) {
 				frm.dashboard.set_headline_alert(
-					__("The daily auto-creation job has not run yet. Click <b>Generate Now</b> to run it immediately."),
+					__(
+						"The daily auto-creation job has not run yet. Click <b>Generate Now</b> to run it immediately."
+					),
 					"blue"
 				);
 				frm.change_custom_button_type(__("Generate Now"), null, "primary");

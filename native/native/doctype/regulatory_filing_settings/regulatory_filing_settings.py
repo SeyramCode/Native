@@ -109,9 +109,9 @@ def _run_daily():
 
 	if problems:
 		raise RegulatoryFilingRunError(
-			_("Regulatory Filing daily run had problems. Open Error Log and search for '{0}' for details and how to fix them.").format(
-				ERROR_LOG_PREFIX
-			)
+			_(
+				"Regulatory Filing daily run had problems. Open Error Log and search for '{0}' for details and how to fix them."
+			).format(ERROR_LOG_PREFIX)
 			+ "\n\n"
 			+ "\n".join(problems)
 		)
@@ -134,13 +134,16 @@ def generate_now():
 	job_name = frappe.db.get_value("Scheduled Job Type", {"method": DAILY_JOB})
 	if not job_name:
 		frappe.throw(
-			_("The daily job is not registered yet. Ask your administrator to run <code>bench migrate</code>."),
+			_(
+				"The daily job is not registered yet. Ask your administrator to run <code>bench migrate</code>."
+			),
 			title=_("Job Not Found"),
 		)
 
 	if not settings.generate_from:
 		frappe.throw(
-			_("Set <b>Generate Filings Due From</b> before generating filings."), title=_("Missing Start Date")
+			_("Set <b>Generate Filings Due From</b> before generating filings."),
+			title=_("Missing Start Date"),
 		)
 
 	frappe.flags.regulatory_filing_run = None
@@ -188,7 +191,9 @@ def generate_now():
 def get_job_status():
 	"""Whether the daily job has run yet, for the Settings form banner."""
 	frappe.has_permission(SETTINGS, "read", throw=True)
-	return frappe.db.get_value("Scheduled Job Type", {"method": DAILY_JOB}, ["name", "last_execution"], as_dict=True)
+	return frappe.db.get_value(
+		"Scheduled Job Type", {"method": DAILY_JOB}, ["name", "last_execution"], as_dict=True
+	)
 
 
 # --------------------------------------------------------------------------
@@ -223,9 +228,9 @@ def create_due_filings():
 	except Exception as e:
 		frappe.db.rollback()
 		_log_run_failure(e)
-		summary = _("Auto-creation stopped with an unexpected error after creating {0} filing(s). See Error Log.").format(
-			len(result.created)
-		)
+		summary = _(
+			"Auto-creation stopped with an unexpected error after creating {0} filing(s). See Error Log."
+		).format(len(result.created))
 		return {"status": "Failed", "summary": summary, **result}
 
 	if result.failed:
@@ -291,7 +296,9 @@ def get_periods(filing_type, company, generate_from, horizon, warnings=None):
 	if not length:
 		raise RegulatoryFilingSetupError(
 			_("Filing type {0} has no valid Frequency.").format(filing_type.name),
-			hint=_("Open the filing type and choose a Frequency (Monthly, Quarterly, Half-Yearly or Annually)."),
+			hint=_(
+				"Open the filing type and choose a Frequency (Monthly, Quarterly, Half-Yearly or Annually)."
+			),
 		)
 
 	anchor = get_period_anchor(filing_type, company, warnings)
@@ -438,7 +445,7 @@ def _build_summary(result, today, horizon):
 	]
 	if result.created:
 		shown = ", ".join(result.created[:10])
-		more = _(" and {0} more").format(len(result.created) - 10) if len(result.created) > 10 else ""
+		more = " " + _("and {0} more").format(len(result.created) - 10) if len(result.created) > 10 else ""
 		lines.append(_("Created {0} filing(s): {1}{2}.").format(len(result.created), shown, more))
 	else:
 		lines.append(_("No new filings were needed."))
@@ -499,15 +506,15 @@ def _log_warning(company, message):
 				_("None yet. Filings were created normally. This is a reminder only."),
 				_("HOW TO FIX"),
 				_(
-					"Create the current Fiscal Year for {0} (Accounting > Fiscal Year). "
-					"ERPNext also needs it before transactions can be posted in the new year."
+					"Create the current Fiscal Year for {0} (Accounting > Fiscal Year). ERPNext also needs it before transactions can be posted in the new year."
 				).format(company),
 			]
 		),
 		reference_doctype="Company",
 		reference_name=company,
 	)
-	frappe.db.commit()
+	# Deliberate: the run commits each filing as it goes, and the log must survive a later rollback.
+	frappe.db.commit()  # nosemgrep
 
 
 def _log_run_failure(error):
@@ -528,9 +535,13 @@ def _hint_for(error, filing_type):
 			"Check the Company set on filing type '{0}'."
 		).format(filing_type)
 	if isinstance(error, frappe.MandatoryError):
-		return _("A required field on Regulatory Filing is empty. If required fields were added recently, give them a default value.")
+		return _(
+			"A required field on Regulatory Filing is empty. If required fields were added recently, give them a default value."
+		)
 	if isinstance(error, frappe.ValidationError):
-		return _("A validation rule on Regulatory Filing rejected the record. The reason above explains which one.")
+		return _(
+			"A validation rule on Regulatory Filing rejected the record. The reason above explains which one."
+		)
 	return _("This is unexpected. Share this log with your developer.")
 
 
@@ -545,8 +556,7 @@ def _log_error(title, what, error, hint, reference_doctype=None, reference_name=
 			_("HOW TO FIX"),
 			hint,
 			_(
-				"Once fixed, nothing else is needed: the next daily run retries automatically. "
-				"To retry now, click Generate Now in Regulatory Filing Settings."
+				"Once fixed, nothing else is needed: the next daily run retries automatically. To retry now, click Generate Now in Regulatory Filing Settings."
 			),
 			"-" * 60,
 			_("TECHNICAL DETAILS (for developers)"),
@@ -559,4 +569,5 @@ def _log_error(title, what, error, hint, reference_doctype=None, reference_name=
 		reference_doctype=reference_doctype,
 		reference_name=reference_name,
 	)
-	frappe.db.commit()
+	# Deliberate: callers roll back failed work first; the Error Log must survive the job's final rollback.
+	frappe.db.commit()  # nosemgrep
