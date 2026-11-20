@@ -20,7 +20,7 @@ MANAGER_PTYPES = {"read", "select", "print", "email", "report", "export"}
 
 
 @frappe.whitelist()
-def get_feedback_history(employee, appraisal):
+def get_feedback_history(employee: str, appraisal: str):
 	"""Override of hrms get_feedback_history for the Appraisal's Feedback tab.
 
 	HR Manager gets every review with the reviewer. Everyone else who can read
@@ -44,7 +44,10 @@ def get_feedback_history(employee, appraisal):
 		feedback = [
 			anonymise(f)
 			for f in frappe.get_all(
-				"Employee Performance Feedback", filters=filters, fields=FEEDBACK_FIELDS, order_by="added_on desc"
+				"Employee Performance Feedback",
+				filters=filters,
+				fields=FEEDBACK_FIELDS,
+				order_by="added_on desc",
 			)
 		]
 
@@ -112,7 +115,9 @@ def has_appraisal_permission(doc, ptype=None, user=None):
 	mine = get_user_employees(user)
 	if doc.employee in mine:
 		return None
-	if (ptype or "read") in MANAGER_PTYPES and frappe.db.get_value("Employee", doc.employee, "reports_to") in mine:
+	if (ptype or "read") in MANAGER_PTYPES and frappe.db.get_value(
+		"Employee", doc.employee, "reports_to"
+	) in mine:
 		return None
 	return False
 
@@ -146,7 +151,9 @@ def validate_single_feedback_per_reviewer(doc, method=None):
 	)
 	if existing:
 		frappe.throw(
-			_("{0} has already submitted feedback {1} for appraisal {2}. Cancel it before submitting a new one.").format(
+			_(
+				"{0} has already submitted feedback {1} for appraisal {2}. Cancel it before submitting a new one."
+			).format(
 				frappe.bold(doc.reviewer_name or doc.reviewer),
 				get_link_to_form("Employee Performance Feedback", existing),
 				frappe.bold(doc.appraisal),
@@ -157,7 +164,9 @@ def validate_single_feedback_per_reviewer(doc, method=None):
 
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
-def get_appraisals_for_feedback(doctype, txt, searchfield, start, page_len, filters):
+def get_appraisals_for_feedback(
+	doctype: str, txt: str, searchfield: str, start: int, page_len: int, filters: dict
+):
 	"""Appraisal picker on the feedback form.
 
 	Peers cannot read other people's appraisals, so the standard link search
@@ -192,7 +201,7 @@ def get_appraisals_for_feedback(doctype, txt, searchfield, start, page_len, filt
 
 
 @frappe.whitelist()
-def get_feedback_details(employee, appraisal=None):
+def get_feedback_details(employee: str, appraisal: str | None = None):
 	"""Values the feedback form normally fetches from Employee and Appraisal.
 
 	Reviewers cannot read a colleague's Employee or Appraisal record, so the
@@ -247,7 +256,9 @@ def check_hrms_compatibility():
 		problems += [f"{doctype}.{f} is gone." for f in fields if not meta.has_field(f)]
 
 	if not frappe.db.exists("Custom Role", {"report": "Appraisal Overview"}):
-		problems.append("Appraisal Overview is no longer restricted to HR Manager. Run native.patches.secure_appraisal_scores.")
+		problems.append(
+			"Appraisal Overview is no longer restricted to HR Manager. Run native.patches.secure_appraisal_scores."
+		)
 
 	if problems:
 		message = "\n".join(problems)

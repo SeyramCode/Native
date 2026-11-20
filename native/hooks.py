@@ -258,24 +258,22 @@ override_doctype_dashboards = {"Customer": "native.customer.get_dashboard_data"}
 
 # Document Events
 # ---------------
-#fixtures = [
-    #{
-       # "dt": "DocType",
-       # "filters": [
-       #     ["name", "in", ["Renewal Tracking", "Renewal Tracking Item"]]
-      #  ]
- #   }
-#]
+# fixtures = [
+# {
+# "dt": "DocType",
+# "filters": [
+#     ["name", "in", ["Renewal Tracking", "Renewal Tracking Item"]]
+#  ]
+#   }
+# ]
 # Scheduled Tasks
 # ---------------
 
 scheduler_events = {
-    "cron": {
-        "0 2 * * *": [  # Keep it as a list
-            "native.native.doctype.renewal_tracking.renewal_tracking.update_all_renewal_stages_heavy"
-        ]
-    },
-    "daily": [
-        "native.native.doctype.regulatory_filing_settings.regulatory_filing_settings.run_daily"
-    ]
+	"cron": {
+		"0 2 * * *": [  # Keep it as a list
+			"native.native.doctype.renewal_tracking.renewal_tracking.update_all_renewal_stages_heavy"
+		]
+	},
+	"daily": ["native.native.doctype.regulatory_filing_settings.regulatory_filing_settings.run_daily"],
 }
