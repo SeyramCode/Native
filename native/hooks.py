@@ -43,8 +43,9 @@ app_license = "mit"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
+# include js in doctype views
 doctype_js = {
+	"Employee Performance Feedback": "public/js/employee_performance_feedback.js",
 	"Sales Order": "public/js/sales_order.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
@@ -120,13 +121,15 @@ doctype_js = {
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
-#
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+permission_query_conditions = {
+	"Appraisal": "native.appraisal.get_appraisal_permission_query",
+	"Employee Performance Feedback": "native.appraisal.get_feedback_permission_query",
+}
+
+has_permission = {
+	"Appraisal": "native.appraisal.has_appraisal_permission",
+	"Employee Performance Feedback": "native.appraisal.has_feedback_permission",
+}
 
 # DocType Class
 # ---------------
@@ -139,6 +142,15 @@ doctype_js = {
 # Document Events
 # ---------------
 # Hook on document methods and events
+
+after_migrate = ["native.appraisal.check_hrms_compatibility"]
+
+doc_events = {
+	"Employee Performance Feedback": {
+		"validate": "native.appraisal.validate_feedback_reviewer",
+		"before_submit": "native.appraisal.validate_single_feedback_per_reviewer",
+	},
+}
 
 # doc_events = {
 # 	"*": {
@@ -177,9 +189,9 @@ doctype_js = {
 # Overriding Methods
 # ------------------------------
 #
-# override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "native.event.get_events"
-# }
+override_whitelisted_methods = {
+	"hrms.hr.doctype.appraisal.appraisal.get_feedback_history": "native.appraisal.get_feedback_history",
+}
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
@@ -251,24 +263,22 @@ override_doctype_dashboards = {
 
 # Document Events
 # ---------------
-#fixtures = [
-    #{
-       # "dt": "DocType",
-       # "filters": [
-       #     ["name", "in", ["Renewal Tracking", "Renewal Tracking Item"]]
-      #  ]
- #   }
-#]
+# fixtures = [
+# {
+# "dt": "DocType",
+# "filters": [
+#     ["name", "in", ["Renewal Tracking", "Renewal Tracking Item"]]
+#  ]
+#   }
+# ]
 # Scheduled Tasks
 # ---------------
 
 scheduler_events = {
-    "cron": {
-        "0 2 * * *": [  # Keep it as a list
-            "native.native.doctype.renewal_tracking.renewal_tracking.update_all_renewal_stages_heavy"
-        ]
-    },
-    "daily": [
-        "native.native.doctype.regulatory_filing_settings.regulatory_filing_settings.run_daily"
-    ]
+	"cron": {
+		"0 2 * * *": [  # Keep it as a list
+			"native.native.doctype.renewal_tracking.renewal_tracking.update_all_renewal_stages_heavy"
+		]
+	},
+	"daily": ["native.native.doctype.regulatory_filing_settings.regulatory_filing_settings.run_daily"],
 }
