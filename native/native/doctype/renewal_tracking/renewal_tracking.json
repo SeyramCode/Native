@@ -42,6 +42,23 @@
   "contacts_tab",
   "custom_contact",
   "column_break_dayn",
+  "billing_address_section",
+  "customer_address",
+  "address_display",
+  "column_break_billing",
+  "contact_person",
+  "contact_display",
+  "contact_mobile",
+  "contact_phone",
+  "contact_email",
+  "shipping_address_section",
+  "shipping_address_name",
+  "shipping_address",
+  "company_address_section",
+  "company_address",
+  "company_address_display",
+  "column_break_company_address",
+  "company_contact_person",
   "section_break_mbyr",
   "reference_doctype",
   "column_break_qyiy",
@@ -142,7 +159,8 @@
    "fieldtype": "Link",
    "label": "Customer's Purchase Order",
    "link_filters": "[[\"Sales Order\",\"customer_name\",\"=\",\"eval:doc.customer\"]]",
-   "options": "Sales Order"
+   "options": "Sales Order",
+   "search_index": 1
   },
   {
    "fetch_from": "customer.account_manager",
@@ -259,6 +277,7 @@
    "fetch_from": "customer.email_id",
    "fieldname": "custom_contact",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Contact",
    "options": "Customer"
   },
@@ -277,6 +296,7 @@
    "allow_on_submit": 1,
    "fieldname": "reference_doctype",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Reference Doctype",
    "options": "DocType",
    "read_only": 1
@@ -285,7 +305,6 @@
    "allow_on_submit": 1,
    "fieldname": "refererence_name",
    "fieldtype": "Dynamic Link",
-   "hidden": 1,
    "label": "Reference Name",
    "options": "reference_doctype",
    "read_only": 1
@@ -297,13 +316,111 @@
   {
    "fieldname": "column_break_qyiy",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "billing_address_section",
+   "fieldtype": "Section Break",
+   "label": "Billing Address"
+  },
+  {
+   "fieldname": "customer_address",
+   "fieldtype": "Link",
+   "label": "Customer Address",
+   "options": "Address"
+  },
+  {
+   "fieldname": "address_display",
+   "fieldtype": "Small Text",
+   "label": "Address",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_billing",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "contact_person",
+   "fieldtype": "Link",
+   "label": "Contact Person",
+   "options": "Contact"
+  },
+  {
+   "fieldname": "contact_display",
+   "fieldtype": "Small Text",
+   "label": "Contact",
+   "read_only": 1
+  },
+  {
+   "fieldname": "contact_mobile",
+   "fieldtype": "Data",
+   "label": "Mobile No",
+   "options": "Phone",
+   "read_only": 1
+  },
+  {
+   "fieldname": "contact_phone",
+   "fieldtype": "Data",
+   "label": "Phone",
+   "options": "Phone",
+   "read_only": 1
+  },
+  {
+   "fieldname": "contact_email",
+   "fieldtype": "Data",
+   "label": "Contact Email",
+   "options": "Email",
+   "read_only": 1
+  },
+  {
+   "fieldname": "shipping_address_section",
+   "fieldtype": "Section Break",
+   "label": "Shipping Address"
+  },
+  {
+   "fieldname": "shipping_address_name",
+   "fieldtype": "Link",
+   "label": "Shipping Address",
+   "options": "Address"
+  },
+  {
+   "fieldname": "shipping_address",
+   "fieldtype": "Small Text",
+   "label": "Shipping Address Details",
+   "read_only": 1
+  },
+  {
+   "fieldname": "company_address_section",
+   "fieldtype": "Section Break",
+   "label": "Company Address"
+  },
+  {
+   "fieldname": "company_address",
+   "fieldtype": "Link",
+   "label": "Company Address Name",
+   "options": "Address"
+  },
+  {
+   "fieldname": "company_address_display",
+   "fieldtype": "Small Text",
+   "label": "Company Address",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_company_address",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company_contact_person",
+   "fieldtype": "Link",
+   "label": "Company Contact Person",
+   "options": "Contact"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2026-03-03 15:13:35.924078",
+ "modified": "2026-11-23 10:21:49.338466",
  "modified_by": "Administrator",
  "module": "Native",
  "name": "Renewal Tracking",
@@ -324,6 +441,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",

@@ -1,7 +1,57 @@
 // Copyright (c) 2026, Richmond Gedziq and contributors
 // For license information, please see license.txt
 
+const CUSTOMER_ADDRESS_CONTACT_FIELDS = [
+	"customer_address",
+	"address_display",
+	"shipping_address_name",
+	"shipping_address",
+	"contact_person",
+	"contact_display",
+	"contact_mobile",
+	"contact_phone",
+	"contact_email",
+];
+const COMPANY_ADDRESS_CONTACT_FIELDS = [
+	"company_address",
+	"company_address_display",
+	"company_contact_person",
+];
+
 frappe.ui.form.on("Renewal Tracking", {
+	setup: function (frm) {
+		const address_query = (link_doctype, link_field) => () => ({
+			query: "frappe.contacts.doctype.address.address.address_query",
+			filters: { link_doctype, link_name: frm.doc[link_field] || "" },
+		});
+		const contact_query = (link_doctype, link_field) => () => ({
+			query: "frappe.contacts.doctype.contact.contact.contact_query",
+			filters: { link_doctype, link_name: frm.doc[link_field] || "" },
+		});
+
+		frm.set_query("customer_address", address_query("Customer", "customer"));
+		frm.set_query("shipping_address_name", address_query("Customer", "customer"));
+		frm.set_query("contact_person", contact_query("Customer", "customer"));
+		frm.set_query("company_address", address_query("Company", "company"));
+		frm.set_query("company_contact_person", contact_query("Company", "company"));
+	},
+
+	customer_address: function (frm) {
+		erpnext.utils.get_address_display(frm, "customer_address", "address_display");
+	},
+
+	shipping_address_name: function (frm) {
+		erpnext.utils.get_address_display(frm, "shipping_address_name", "shipping_address");
+	},
+
+	company_address: function (frm) {
+		erpnext.utils.get_address_display(frm, "company_address", "company_address_display");
+	},
+
+	contact_person: function (frm) {
+		set_contact_details(frm);
+	},
+
 	refresh: function (frm) {
 		// Recalculate items on refresh to ensure values are correct
 		if (frm.doc.items && frm.doc.items.length > 0) {
@@ -80,6 +130,7 @@ frappe.ui.form.on("Renewal Tracking", {
 		if (frm.doc.currency) {
 			get_exchange_rate(frm);
 		}
+		reset_address_contact(frm, COMPANY_ADDRESS_CONTACT_FIELDS, { company: frm.doc.company });
 	},
 
 	customer: function (frm) {
@@ -95,12 +146,17 @@ frappe.ui.form.on("Renewal Tracking", {
 					frm.clear_table("items");
 					frm.refresh_field("items");
 					calculate_totals(frm);
+					reset_address_contact(frm, CUSTOMER_ADDRESS_CONTACT_FIELDS, {
+						customer: frm.doc.customer,
+					});
 				},
 				function () {
 					// User cancelled - revert the customer change
 					frm.set_value("customer", frm.doc.__last_customer || "");
 				}
 			);
+		} else {
+			reset_address_contact(frm, CUSTOMER_ADDRESS_CONTACT_FIELDS, { customer: frm.doc.customer });
 		}
 
 		// Store the current value for potential revert
@@ -553,6 +609,10 @@ function fetch_items_from_sales_order(frm) {
 			sales_order: frm.doc.customer_po,
 		},
 		callback: function (r) {
+			if (r.message && r.message.address_contact) {
+				set_address_contact_from_sales_order(frm, r.message.address_contact);
+			}
+
 			if (r.message && r.message.items && r.message.items.length > 0) {
 				// Set flag to prevent currency event from firing
 				frm.__fetching_from_sales_order = true;
@@ -614,4 +674,61 @@ function add_fetched_items(frm, items) {
 		message: __("Items fetched successfully from Sales Order"),
 		indicator: "green",
 	});
+}
+
+// Clear a party's address/contact fields, then fill them with that party's defaults.
+function reset_address_contact(frm, fields, party) {
+	const values = {};
+	fields.forEach((field) => {
+		values[field] = "";
+	});
+
+	if (!Object.values(party).some(Boolean)) {
+		frm.set_value(values);
+		return;
+	}
+
+	frappe.call({
+		method: "native.native.doctype.renewal_tracking.renewal_tracking.get_address_contact_defaults",
+		args: party,
+		callback: function (r) {
+			fields.forEach((field) => {
+				if (r.message && r.message[field]) values[field] = r.message[field];
+			});
+			frm.set_value(values);
+		},
+	});
+}
+
+function set_contact_details(frm) {
+	const fields = ["contact_display", "contact_mobile", "contact_phone", "contact_email"];
+	const values = {};
+	fields.forEach((field) => {
+		values[field] = "";
+	});
+
+	if (!frm.doc.contact_person) {
+		frm.set_value(values);
+		return;
+	}
+
+	frappe.call({
+		method: "frappe.contacts.doctype.contact.contact.get_contact_details",
+		args: { contact: frm.doc.contact_person },
+		callback: function (r) {
+			fields.forEach((field) => {
+				if (r.message && r.message[field]) values[field] = r.message[field];
+			});
+			frm.set_value(values);
+		},
+	});
+}
+
+// Copy the Sales Order's address/contact values. Keep the current value where the Sales Order has none.
+function set_address_contact_from_sales_order(frm, so_values) {
+	const values = {};
+	Object.keys(so_values).forEach((field) => {
+		if (so_values[field]) values[field] = so_values[field];
+	});
+	frm.set_value(values);
 }

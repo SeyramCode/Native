@@ -8,6 +8,22 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import add_days, date_diff, flt, getdate, nowdate, today
 
+# Contact detail fields shared with Sales Order (filled from the selected Contact).
+CONTACT_DETAIL_FIELDS = ("contact_display", "contact_mobile", "contact_phone", "contact_email")
+
+# Address and contact fields shared with Sales Order (same fieldnames on both doctypes).
+ADDRESS_CONTACT_FIELDS = (
+	"customer_address",
+	"address_display",
+	"contact_person",
+	*CONTACT_DETAIL_FIELDS,
+	"shipping_address_name",
+	"shipping_address",
+	"company_address",
+	"company_address_display",
+	"company_contact_person",
+)
+
 
 # on_submit saves renewal_stage and days_remaining with db_set right after
 # calculate_renewal_stage; the semgrep rule only looks inside that method.
@@ -231,7 +247,36 @@ def get_items_from_sales_order(sales_order: str):
 		"items": items,
 		"currency": so_doc.currency,
 		"exchange_rate": so_doc.conversion_rate if hasattr(so_doc, "conversion_rate") else 1.0,
+		"address_contact": {field: so_doc.get(field) for field in ADDRESS_CONTACT_FIELDS},
 	}
+
+
+@frappe.whitelist()
+def get_address_contact_defaults(customer: str | None = None, company: str | None = None) -> dict:
+	"""Default addresses and contacts for a customer and/or company, with display texts."""
+	from erpnext.setup.doctype.company.company import get_default_company_address
+	from frappe.contacts.doctype.address.address import get_address_display, get_default_address
+	from frappe.contacts.doctype.contact.contact import get_contact_details, get_default_contact
+
+	out = {}
+
+	if customer:
+		out["customer_address"] = get_default_address("Customer", customer)
+		out["address_display"] = get_address_display(out["customer_address"])
+		out["shipping_address_name"] = get_default_address("Customer", customer, "is_shipping_address")
+		out["shipping_address"] = get_address_display(out["shipping_address_name"])
+
+		contact = get_default_contact("Customer", customer)
+		out["contact_person"] = contact
+		if contact:
+			details = get_contact_details(contact)
+			out.update({field: details.get(field) for field in CONTACT_DETAIL_FIELDS})
+
+	if company:
+		out["company_address"] = get_default_company_address(company)
+		out["company_address_display"] = get_address_display(out["company_address"])
+
+	return out
 
 
 @frappe.whitelist()
@@ -424,6 +469,54 @@ def make_quotation(source_name: str, target_doc: Document | str | None = None):
 					"rate": "rate",
 					"amount": "amount",
 					"brand": "brand",
+				},
+			},
+		},
+		target_doc,
+		set_missing_values,
+	)
+
+	return doclist
+
+
+@frappe.whitelist()
+def make_renewal_tracking(source_name: str, target_doc: Document | str | None = None):
+	"""Create Renewal Tracking from a submitted Sales Order"""
+	from frappe.model.mapper import get_mapped_doc
+
+	existing = frappe.db.get_value(
+		"Renewal Tracking", {"customer_po": source_name, "docstatus": ["<", 2]}, "name"
+	)
+	if existing:
+		frappe.throw(
+			_("Renewal Tracking {0} already exists for Sales Order {1}").format(
+				frappe.bold(existing), frappe.bold(source_name)
+			),
+			title=_("Duplicate Renewal Tracking"),
+		)
+
+	def set_missing_values(source, target):
+		target.date = nowdate()
+		target.reference_doctype = "Sales Order"
+		target.refererence_name = source.name
+
+	doclist = get_mapped_doc(
+		"Sales Order",
+		source_name,
+		{
+			"Sales Order": {
+				"doctype": "Renewal Tracking",
+				"field_map": {
+					"name": "customer_po",
+					"conversion_rate": "exchange_rate",
+				},
+				"field_no_map": ["naming_series", "amended_from"],
+				"validation": {"docstatus": ["=", 1]},
+			},
+			"Sales Order Item": {
+				"doctype": "Renewal Tracking Item",
+				"field_map": {
+					"uom": "oum",
 				},
 			},
 		},
