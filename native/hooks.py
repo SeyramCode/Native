@@ -43,8 +43,10 @@ app_license = "mit"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
+# include js in doctype views
 doctype_js = {
 	"Employee Performance Feedback": "public/js/employee_performance_feedback.js",
+	"Sales Order": "public/js/sales_order.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -197,7 +199,10 @@ override_whitelisted_methods = {
 # override_doctype_dashboards = {
 # 	"Task": "native.task.get_dashboard_data"
 # }
-override_doctype_dashboards = {"Customer": "native.customer.get_dashboard_data"}
+override_doctype_dashboards = {
+	"Customer": "native.customer.get_dashboard_data",
+	"Sales Order": "native.sales_order.get_dashboard_data",
+}
 
 # exempt linked doctypes from being automatically cancelled
 #
