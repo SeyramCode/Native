@@ -323,12 +323,14 @@
    "label": "Billing Address"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "customer_address",
    "fieldtype": "Link",
    "label": "Customer Address",
    "options": "Address"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "address_display",
    "fieldtype": "Small Text",
    "label": "Address",
@@ -339,18 +341,21 @@
    "fieldtype": "Column Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "contact_person",
    "fieldtype": "Link",
    "label": "Contact Person",
    "options": "Contact"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "contact_display",
    "fieldtype": "Small Text",
    "label": "Contact",
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "contact_mobile",
    "fieldtype": "Data",
    "label": "Mobile No",
@@ -358,6 +363,7 @@
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "contact_phone",
    "fieldtype": "Data",
    "label": "Phone",
@@ -365,6 +371,7 @@
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "contact_email",
    "fieldtype": "Data",
    "label": "Contact Email",
@@ -377,12 +384,14 @@
    "label": "Shipping Address"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "shipping_address_name",
    "fieldtype": "Link",
    "label": "Shipping Address",
    "options": "Address"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "shipping_address",
    "fieldtype": "Small Text",
    "label": "Shipping Address Details",
@@ -394,12 +403,14 @@
    "label": "Company Address"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "company_address",
    "fieldtype": "Link",
    "label": "Company Address Name",
    "options": "Address"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "company_address_display",
    "fieldtype": "Small Text",
    "label": "Company Address",
@@ -410,6 +421,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "company_contact_person",
    "fieldtype": "Link",
    "label": "Company Contact Person",
@@ -420,7 +432,7 @@
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2026-11-23 10:21:49.338466",
+ "modified": "2026-11-23 10:57:08.907351",
  "modified_by": "Administrator",
  "module": "Native",
  "name": "Renewal Tracking",
